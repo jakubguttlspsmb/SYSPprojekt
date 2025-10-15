@@ -8,12 +8,12 @@
 		<product version="4.0" isee:build_number="3710" isee:saved_by_v1="true" lang="en">Stella Professional</product>
 	</header>
 	<ai_information>
-		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1759995160" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="3ygA0DO+zK9oXpQNbwpluznynH0Znrl3UkJbL5F720zKk4mrrScRQ+jkljLywWdVHv4pgT7UkzkZQ1bQUa5rBg=="/>
+		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1760513512" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="sfnGoxb60mGC/26wvUCAMZgwI8Nn+I4TkWEANAQX2faL2LlsR91De0zqITroAjuuoFXzhtoKV2xZGktIlG91Aw=="/>
 	</ai_information>
 	<sim_specs isee:sim_duration="1.5" isee:run_prefix="Run" isee:simulation_delay="0.0125" isee:restore_on_start="false" method="Euler" time_units="seconds" isee:instantaneous_flows="false" isee:ignore_module_errors="false" isee:strict_units="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
 		<start>0</start>
 		<stop>120</stop>
-		<dt reciprocal="true">4</dt>
+		<dt>0.25</dt>
 	</sim_specs>
 	<isee:prefs saved_runs="5" keep="false" show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" isee:design="Deluxe Prev-Next Blue Green Pastel" isee:design_custom="false" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" rifp="true"/>
 	<isee:multiplayer_settings include_chat="true" allow_observers="false" advance_time_increment="1" max_advance_time_in_ms="0" model_stops_when_players_drop="false" observer_start_page="home_page" enabled="false"/>
@@ -22,49 +22,38 @@
 	</isee:time_formats>
 	<isee:number_format_extenders/>
 	<default_format/>
-	<model_units>
-		<unit name="Seconds">
-			<eqn/>
-			<alias>s</alias>
-			<alias>second</alias>
-		</unit>
-	</model_units>
+	<model_units/>
 	<model>
 		<variables>
 			<stock name="Incoming Requests">
 				<eqn>0</eqn>
 				<inflow>Arrival</inflow>
-				<outflow>Process</outflow>
-				<non_negative/>
-				<units/>
-			</stock>
-			<stock name="Server Load">
-				<eqn>0</eqn>
-				<inflow>Process</inflow>
 				<outflow>Flow_2</outflow>
 				<non_negative/>
-				<units/>
 			</stock>
-			<stock name="Available capacity">
+			<stock name="finished requests">
+				<eqn>0</eqn>
+				<inflow>Process</inflow>
+				<non_negative/>
+			</stock>
+			<stock name="Unavailable capacity">
 				<eqn>0</eqn>
 				<inflow>Flow_2</inflow>
+				<outflow>Process</outflow>
+				<outflow>Flow_3</outflow>
 				<non_negative/>
-				<units/>
 			</stock>
 			<flow name="Process">
-				<eqn>(Incoming_Requests-processing_rate)/100</eqn>
+				<eqn>processing_rate</eqn>
 				<non_negative/>
-				<units>Per Second</units>
 			</flow>
 			<flow name="Flow 2">
-				<eqn>-Server_Load</eqn>
+				<eqn>IF(max_capacity&gt;=Unavailable_capacity)THEN 1000 ELSE 0</eqn>
 				<non_negative/>
-				<units>Per Second</units>
 			</flow>
 			<flow name="Arrival">
 				<eqn>legitimate_rate+attack_rate</eqn>
 				<non_negative/>
-				<units>Per Second</units>
 			</flow>
 			<aux name="legitimate rate">
 				<eqn>200</eqn>
@@ -75,7 +64,25 @@
 			<aux name="processing rate">
 				<eqn>300</eqn>
 			</aux>
-			<aux name="Max capacity">
+			<stock name="Server Load">
+				<eqn>1000</eqn>
+				<inflow>Load</inflow>
+				<non_negative/>
+			</stock>
+			<flow name="Load">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<stock name="unfinished requests">
+				<eqn>0</eqn>
+				<inflow>Flow_3</inflow>
+				<non_negative/>
+			</stock>
+			<flow name="Flow 3">
+				<eqn>0</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="max capacity">
 				<eqn>50000</eqn>
 			</aux>
 		</variables>
@@ -127,7 +134,7 @@
 				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
 				<isee:financial_table color="black" background="#E0E0E0" text_align="right" font_size="12pt" hide_border="false" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
 			</style>
-			<view isee:show_pages="false" background="white" page_width="1090" page_height="761" isee:page_rows="2" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+			<view isee:show_pages="false" background="white" page_width="1090" page_height="761" isee:page_cols="2" isee:page_rows="2" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
 				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
 					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
 						<shape type="rectangle" width="45" height="35"/>
@@ -166,42 +173,38 @@
 					</graph>
 					<table color="black" background="#E0E0E0" text_align="right" font_size="12pt" orientation="vertical" wrap_text="false" isee:auto_fit="true" isee:use_alternate_row_colors="false" isee:unlimited_table_length="false" blank_column_width="80" column_width="160" interval="1" report_balances="beginning" report_flows="instantaneous" header_font_style="normal" header_font_weight="normal" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="12pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
 				</style>
-				<stock x="273" y="185" name="Incoming Requests"/>
-				<stock label_side="top" x="273" y="331" name="Server Load"/>
-				<stock x="273" y="487" name="Available capacity"/>
-				<flow x="269" y="252" name="Process">
+				<stock label_side="left" label_angle="135" x="273" y="189" name="Incoming Requests"/>
+				<stock label_side="top" x="273" y="460" name="finished requests"/>
+				<stock x="273" y="321.188" name="Unavailable capacity"/>
+				<flow x="273" y="384.594" name="Process">
 					<pts>
-						<pt x="269" y="202.5"/>
-						<pt x="269" y="313.5"/>
+						<pt x="273" y="338.688"/>
+						<pt x="273" y="442.5"/>
 					</pts>
 				</flow>
-				<flow x="273" y="403" name="Flow 2">
+				<flow x="273" y="249.094" name="Flow 2">
 					<pts>
-						<pt x="273" y="348.5"/>
-						<pt x="273" y="469.5"/>
+						<pt x="273" y="206.5"/>
+						<pt x="273" y="303.688"/>
 					</pts>
 				</flow>
-				<flow x="273" y="116.25" name="Arrival">
+				<flow x="273" y="118.25" name="Arrival">
 					<pts>
 						<pt x="273" y="65"/>
-						<pt x="273" y="167.5"/>
+						<pt x="273" y="171.5"/>
 					</pts>
 				</flow>
 				<aux x="186" y="61" name="legitimate rate"/>
 				<aux x="384" y="61" name="attack rate"/>
-				<connector uid="1" angle="296.193">
+				<connector uid="1" angle="295.264">
 					<from>legitimate_rate</from>
 					<to>Arrival</to>
 				</connector>
-				<connector uid="2" angle="252.553">
+				<connector uid="2" angle="253.374">
 					<from>attack_rate</from>
 					<to>Arrival</to>
 				</connector>
-				<aux x="384" y="244" name="processing rate"/>
-				<connector uid="4" angle="335.951">
-					<from>Server_Load</from>
-					<to>Flow_2</to>
-				</connector>
+				<aux x="349" y="384.594" name="processing rate"/>
 				<stacked_container uid="6" x="535" y="75" width="202" height="146">
 					<graph width="202" height="146" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
 						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
@@ -209,41 +212,71 @@
 						</plot>
 					</graph>
 				</stacked_container>
-				<stacked_container uid="7" x="535" y="239" width="202" height="146">
+				<stacked_container uid="7" x="550" y="411" width="202" height="146">
 					<graph width="202" height="146" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
 						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
-							<entity name="Server_Load"/>
+							<entity name="finished_requests"/>
 						</plot>
 					</graph>
 				</stacked_container>
-				<stacked_container uid="8" x="535" y="409" width="202" height="146">
+				<stacked_container uid="8" x="535" y="236.25" width="202" height="146">
 					<graph width="202" height="146" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
 						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
-							<entity name="Available_capacity"/>
+							<entity name="Unavailable_capacity"/>
 						</plot>
 					</graph>
 				</stacked_container>
-				<aux x="140" y="325" name="Max capacity"/>
-				<connector uid="12" angle="183.731">
-					<from>Incoming_Requests</from>
-					<to>Process</to>
-				</connector>
-				<connector uid="13" angle="183.979">
+				<connector uid="13" angle="180">
 					<from>processing_rate</from>
 					<to>Process</to>
 				</connector>
-				<stacked_container uid="14" x="302.5" y="548" width="196.5" height="127">
-					<table width="196.5" height="127">
+				<stock x="459" y="375" name="Server Load"/>
+				<flow x="458" y="305.25" name="Load">
+					<pts>
+						<pt x="458" y="253"/>
+						<pt x="458" y="357.5"/>
+					</pts>
+				</flow>
+				<stock x="118" y="321.375" name="unfinished requests"/>
+				<stacked_container uid="21" x="172" y="595" width="782" height="250">
+					<table width="782" height="250">
 						<item type="time"/>
-						<item>
-							<entity name="Available_capacity"/>
-						</item>
-						<item>
-							<entity name="Server_Load"/>
-						</item>
 						<item>
 							<entity name="Incoming_Requests"/>
 						</item>
+						<item>
+							<entity name="Flow_2"/>
+						</item>
+						<item>
+							<entity name="Unavailable_capacity"/>
+						</item>
+					</table>
+				</stacked_container>
+				<flow x="201.5" y="321.188" name="Flow 3">
+					<pts>
+						<pt x="250.5" y="321.188"/>
+						<pt x="140.5" y="321.188"/>
+					</pts>
+				</flow>
+				<stacked_container uid="24" x="801" y="418" width="202" height="140">
+					<graph width="202" height="140" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="unfinished_requests"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<aux x="354" y="249.094" name="max capacity"/>
+				<connector uid="29" angle="174.792">
+					<from>max_capacity</from>
+					<to>Flow_2</to>
+				</connector>
+				<connector uid="30" angle="125.417">
+					<from>Unavailable_capacity</from>
+					<to>Flow_2</to>
+				</connector>
+				<stacked_container uid="31" x="1361.5" y="439.25">
+					<table width="350" height="250">
+						<item type="time"/>
 					</table>
 				</stacked_container>
 			</view>
