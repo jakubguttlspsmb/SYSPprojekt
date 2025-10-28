@@ -8,11 +8,11 @@
 		<product version="4.0" isee:build_number="3710" isee:saved_by_v1="true" lang="en">Stella Professional</product>
 	</header>
 	<ai_information>
-		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1761118750" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="Fzfrymb8CUtK0XgGfYcJuFJmtVTnqQCn3676n4h0OPwEjgMrfMHndDRJqXjFQypzPR2WWB34cUQIrTN41cleCg=="/>
+		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1761659125" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="4HT9hcbawzdt/tEaus0nnshMJA4p4ehUEeC1ylp4CuFfr/GPihswmer58UVVYmp4MbpwCZNt3rx/UfklUuSJCg=="/>
 	</ai_information>
-	<sim_specs isee:sim_duration="1.5" isee:run_prefix="Run" isee:simulation_delay="0.00625" isee:restore_on_start="false" method="Euler" time_units="seconds" isee:instantaneous_flows="false" isee:ignore_module_errors="false" isee:strict_units="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
+	<sim_specs isee:sim_duration="1.5" isee:run_prefix="Run" isee:simulation_delay="0.005" isee:restore_on_start="false" method="Euler" time_units="seconds" isee:instantaneous_flows="false" isee:ignore_module_errors="false" isee:strict_units="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
 		<start>0</start>
-		<stop>240</stop>
+		<stop>300</stop>
 		<dt>1</dt>
 	</sim_specs>
 	<isee:prefs saved_runs="5" keep="false" show_module_prefix="true" live_update_on_drag="true" show_restore_buttons="false" layer="model" isee:design="Deluxe Prev-Next Blue Green Pastel" isee:design_custom="false" interface_scale_ui="true" interface_max_page_width="10000" interface_max_page_height="10000" interface_min_page_width="0" interface_min_page_height="0" rifp="true"/>
@@ -28,54 +28,58 @@
 			<stock name="Incoming Requests">
 				<eqn>0</eqn>
 				<inflow>Arrival</inflow>
-				<outflow>Flow_2</outflow>
+				<outflow>Transfer_into_processing</outflow>
+				<non_negative/>
 			</stock>
 			<stock name="finished requests">
 				<eqn>0</eqn>
 				<inflow>Process</inflow>
+				<non_negative/>
 			</stock>
 			<stock name="Unavailable capacity">
 				<eqn>0</eqn>
-				<inflow>Flow_2</inflow>
+				<inflow>Transfer_into_processing</inflow>
 				<outflow>Process</outflow>
-				<outflow>Flow_3</outflow>
+				<outflow>skipped</outflow>
 				<non_negative/>
 			</stock>
 			<flow name="Process">
 				<eqn>IF(Unavailable_capacity&gt;=processing_rate)THEN processing_rate ELSE 0</eqn>
 				<non_negative/>
 			</flow>
-			<flow name="Flow 2">
-				<eqn>IF(max_capacity&gt;=Unavailable_capacity)THEN 1000 ELSE 0</eqn>
+			<flow name="Transfer into processing">
+				<eqn>IF(max_capacity&gt;=Unavailable_capacity)THEN flow_rate ELSE 0</eqn>
 				<non_negative/>
 			</flow>
 			<flow name="Arrival">
-				<eqn>legitimate_rate+attack_rate</eqn>
+				<eqn>IF(TIME&lt;=&quot;attack_duration_(s)&quot;)THEN legitimate_rate+attack_rate ELSE legitimate_rate</eqn>
 				<non_negative/>
 			</flow>
 			<aux name="legitimate rate">
 				<eqn>200</eqn>
 			</aux>
 			<aux name="attack rate">
-				<eqn>1000</eqn>
+				<eqn>500+attack_rate_increase*TIME</eqn>
 			</aux>
 			<aux name="processing rate">
-				<eqn>300</eqn>
+				<eqn>(300/100)*&quot;server_efficiency_(%)&quot;</eqn>
 			</aux>
 			<stock name="Server Load">
 				<eqn>1000</eqn>
 				<inflow>Load</inflow>
+				<outflow>mitigation</outflow>
 				<non_negative/>
 			</stock>
 			<flow name="Load">
-				<eqn>0</eqn>
+				<eqn>Incoming_Requests</eqn>
 				<non_negative/>
 			</flow>
 			<stock name="unfinished requests">
 				<eqn>0</eqn>
-				<inflow>Flow_3</inflow>
+				<inflow>skipped</inflow>
+				<non_negative/>
 			</stock>
-			<flow name="Flow 3">
+			<flow name="skipped">
 				<eqn>IF(Unavailable_capacity&gt;=max_capacity-processing_rate)THEN max_capacity ELSE 0</eqn>
 				<non_negative/>
 			</flow>
@@ -88,11 +92,21 @@
 			<aux name="mitigation effect">
 				<eqn>0</eqn>
 			</aux>
-			<aux name="server efficiency">
-				<eqn>0</eqn>
+			<aux name="server efficiency (%)">
+				<eqn>90</eqn>
 			</aux>
-			<aux name="attack duration">
-				<eqn>0</eqn>
+			<aux name="attack duration (s)">
+				<eqn>200</eqn>
+			</aux>
+			<aux name="flow rate">
+				<eqn>750</eqn>
+			</aux>
+			<flow name="mitigation">
+				<eqn>finished_requests</eqn>
+				<non_negative/>
+			</flow>
+			<aux name="attack rate increase">
+				<eqn>5</eqn>
 			</aux>
 		</variables>
 		<views>
@@ -143,7 +157,7 @@
 				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
 				<isee:financial_table color="black" background="#E0E0E0" text_align="right" font_size="12pt" hide_border="false" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
 			</style>
-			<view isee:show_pages="false" background="white" page_width="1090" page_height="761" isee:page_cols="2" isee:page_rows="2" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+			<view isee:show_pages="false" background="white" page_width="1122" page_height="793" isee:page_cols="2" isee:page_rows="2" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
 				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
 					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
 						<shape type="rectangle" width="45" height="35"/>
@@ -191,7 +205,7 @@
 						<pt x="273" y="442.5"/>
 					</pts>
 				</flow>
-				<flow x="273" y="249.094" name="Flow 2">
+				<flow x="273" y="249.094" name="Transfer into processing">
 					<pts>
 						<pt x="273" y="206.5"/>
 						<pt x="273" y="303.688"/>
@@ -205,14 +219,6 @@
 				</flow>
 				<aux x="186" y="61" name="legitimate rate"/>
 				<aux x="384" y="61" name="attack rate"/>
-				<connector uid="1" angle="295.264">
-					<from>legitimate_rate</from>
-					<to>Arrival</to>
-				</connector>
-				<connector uid="2" angle="253.374">
-					<from>attack_rate</from>
-					<to>Arrival</to>
-				</connector>
 				<aux x="349" y="384.594" name="processing rate"/>
 				<stacked_container uid="6" x="535" y="75" width="202" height="146">
 					<graph width="202" height="146" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
@@ -254,7 +260,7 @@
 							<entity name="Incoming_Requests"/>
 						</item>
 						<item>
-							<entity name="Flow_2"/>
+							<entity name="Transfer_into_processing"/>
 						</item>
 						<item>
 							<entity name="Unavailable_capacity"/>
@@ -267,7 +273,7 @@
 						</item>
 					</table>
 				</stacked_container>
-				<flow x="201.5" y="321.188" name="Flow 3">
+				<flow x="201.5" y="321.188" name="skipped">
 					<pts>
 						<pt x="250.5" y="321.188"/>
 						<pt x="140.5" y="321.188"/>
@@ -280,22 +286,22 @@
 						</plot>
 					</graph>
 				</stacked_container>
-				<aux x="354" y="249.094" name="max capacity"/>
-				<connector uid="29" angle="174.792">
+				<aux x="375" y="236.094" name="max capacity"/>
+				<connector uid="29" angle="187.263">
 					<from>max_capacity</from>
-					<to>Flow_2</to>
+					<to>Transfer_into_processing</to>
 				</connector>
 				<connector uid="30" angle="125.417">
 					<from>Unavailable_capacity</from>
-					<to>Flow_2</to>
+					<to>Transfer_into_processing</to>
 				</connector>
 				<connector uid="32" angle="145.096">
 					<from>Unavailable_capacity</from>
-					<to>Flow_3</to>
+					<to>skipped</to>
 				</connector>
-				<connector uid="33" angle="90">
+				<connector uid="33" angle="90.8236">
 					<from>max_capacity</from>
-					<to>Flow_3</to>
+					<to>skipped</to>
 				</connector>
 				<connector uid="35" angle="314.424">
 					<from>Unavailable_capacity</from>
@@ -303,14 +309,66 @@
 				</connector>
 				<connector uid="36" angle="260.302">
 					<from>processing_rate</from>
-					<to>Flow_3</to>
+					<to>skipped</to>
 				</connector>
 				<aux x="98" y="66" name="mitigation time"/>
 				<aux x="86.5" y="136.25" name="mitigation effect"/>
-				<aux x="482" y="48" name="server efficiency"/>
-				<aux x="414" y="118.25" name="attack duration"/>
+				<aux x="469" y="347.688" name="server efficiency (%)"/>
+				<aux x="414" y="118.25" name="attack duration (s)"/>
+				<connector uid="37" angle="210.888">
+					<from>&quot;attack_duration_(s)&quot;</from>
+					<to>Arrival</to>
+				</connector>
+				<connector uid="38" angle="225.939">
+					<from>attack_rate</from>
+					<to>Arrival</to>
+				</connector>
+				<connector uid="39" angle="310.601">
+					<from>legitimate_rate</from>
+					<to>Arrival</to>
+				</connector>
+				<connector uid="40" angle="224.012">
+					<from>&quot;server_efficiency_(%)&quot;</from>
+					<to>processing_rate</to>
+				</connector>
+				<aux x="183.5" y="236.094" name="flow rate"/>
+				<connector uid="41" angle="351.736">
+					<from>flow_rate</from>
+					<to>Transfer_into_processing</to>
+				</connector>
+				<connector uid="42" angle="19.7468">
+					<from>Incoming_Requests</from>
+					<to>Load</to>
+				</connector>
+				<flow x="1067" y="248.25" name="mitigation">
+					<pts>
+						<pt x="1067" y="210.5"/>
+						<pt x="1067" y="307"/>
+					</pts>
+				</flow>
+				<connector uid="43" angle="354.144">
+					<from>finished_requests</from>
+					<to>mitigation</to>
+				</connector>
+				<stacked_container uid="44" x="1171" y="127.25" width="234" height="142">
+					<graph width="234" height="142" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="Server_Load"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<aux x="445" y="37" name="attack rate increase"/>
+				<connector uid="45" angle="163.142">
+					<from>attack_rate_increase</from>
+					<to>attack_rate</to>
+				</connector>
 			</view>
 		</views>
 	</model>
+	<isee:controls>
+		<isee:control priority="interactive" name='"server_efficiency_(%)"' value="63.5271555022188"/>
+		<isee:control priority="interactive" name="flow_rate" value="658.072174762972"/>
+		<isee:control priority="interactive" name="max_capacity" value="45090.0153429566"/>
+	</isee:controls>
 </xmile>
 
