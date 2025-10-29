@@ -8,7 +8,7 @@
 		<product version="4.0" isee:build_number="3710" isee:saved_by_v1="true" lang="en">Stella Professional</product>
 	</header>
 	<ai_information>
-		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1761727307" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="xZggd2r88me2BGmejyy64bRwfJPyfaHiZxHScRpgr6GQ4rk5/tRqPERqIBB482PAJ4umXKYIT7d9zv5VOtgMDA=="/>
+		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1761764025" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="eyPeu3/90mXwfVOqVg5ZrjSQCOw3jk1TyfbiS2JdSljETpm4AScjGKGxejZWP1IQWYvsz5COSkqhlbObhLaODw=="/>
 	</ai_information>
 	<sim_specs isee:sim_duration="1.5" isee:run_prefix="Run" isee:simulation_delay="0.0025" isee:restore_on_start="false" method="Euler" time_units="seconds" isee:instantaneous_flows="false" isee:ignore_module_errors="false" isee:strict_units="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
 		<start>0</start>
@@ -88,26 +88,28 @@
 			<aux name="attack rate increase">
 				<eqn>5</eqn>
 			</aux>
-			<stock name="company loss">
+			<stock name="Company income">
 				<eqn>0</eqn>
-				<inflow>Loss_Increase</inflow>
+				<inflow>Income_rate</inflow>
 				<non_negative/>
 			</stock>
-			<flow name="Loss Increase">
+			<flow name="Income rate">
+				<doc>Server vydelava 200kc bez zatizeni, nebo pri mensim zatizeni. Pokud zatizeni prekroci 80% hranici, kazde jedno procento znamena 10kc ztratu prijmu serveru (81% = 200 - 10 = 190kc)</doc>
 				<eqn>IF(Unavailable_capacity&gt;slowdown_threshold) THEN
-(loss_rate * ( (Unavailable_capacity - slowdown_threshold)/loss_step)) ELSE 0</eqn>
+max_income - (((Unavailable_capacity-slowdown_threshold) / max_capacity) * 100 * loss_rate)
+ELSE max_income</eqn>
 				<non_negative/>
 			</flow>
 			<aux name="slowdown threshold">
 				<eqn>allowed_maximum * max_capacity</eqn>
 			</aux>
 			<aux name="loss rate">
-				<eqn>20</eqn>
+				<eqn>4</eqn>
 			</aux>
 			<aux name="allowed maximum">
-				<eqn>0.8</eqn>
+				<eqn>0.5</eqn>
 			</aux>
-			<aux name="loss step">
+			<aux name="max income">
 				<eqn>200</eqn>
 			</aux>
 		</variables>
@@ -159,7 +161,7 @@
 				<isee:iframe color="black" background="white" text_align="left" vertical_text_align="top" font_size="12pt" border_width="thin" border_style="solid"/>
 				<isee:financial_table color="black" background="#E0E0E0" text_align="right" font_size="12pt" hide_border="false" auto_fit="true" first_column_width="250" other_column_width="100" header_font_style="normal" header_font_weight="bold" header_text_decoration="none" header_text_align="center" header_vertical_text_align="center" header_font_color="black" header_font_family="Arial" header_font_size="14pt" header_text_padding="2" header_text_border_color="black" header_text_border_width="thin" header_text_border_style="none"/>
 			</style>
-			<view isee:show_pages="false" background="white" page_width="1090" page_height="761" isee:page_cols="2" isee:page_rows="2" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
+			<view isee:show_pages="false" background="white" page_width="1090" page_height="761" isee:page_cols="2" isee:page_rows="2" zoom="80" isee:popup_graphs_are_comparative="true" isee:enable_non_negative_highlights="false" type="stock_flow">
 				<style color="black" background="white" font_style="normal" font_weight="normal" text_decoration="none" text_align="center" vertical_text_align="center" font_color="black" font_family="Arial" font_size="10pt" padding="2" border_color="black" border_width="thin" border_style="none">
 					<stock color="blue" background="white" font_color="blue" font_size="9pt" label_side="top">
 						<shape type="rectangle" width="45" height="35"/>
@@ -248,14 +250,20 @@
 					<to>Process</to>
 				</connector>
 				<stock x="118" y="321.375" name="unfinished requests"/>
-				<stacked_container uid="21" x="172" y="595" width="1085" height="250">
-					<table width="1085" height="250">
+				<stacked_container uid="21" x="172" y="595" width="614" height="250">
+					<table width="614" height="250">
 						<item type="time"/>
+						<item>
+							<entity name="Incoming_Requests"/>
+						</item>
 						<item>
 							<entity name="Unavailable_capacity"/>
 						</item>
 						<item>
-							<entity name="company_loss"/>
+							<entity name="unfinished_requests"/>
+						</item>
+						<item>
+							<entity name="finished_requests"/>
 						</item>
 					</table>
 				</stacked_container>
@@ -325,8 +333,8 @@
 					<from>attack_rate_increase</from>
 					<to>attack_rate</to>
 				</connector>
-				<stock x="1059" y="163.25" name="company loss"/>
-				<flow x="1058" y="93.875" name="Loss Increase">
+				<stock x="1058" y="163.25" name="Company income"/>
+				<flow x="1058" y="93.875" name="Income rate">
 					<pts>
 						<pt x="1058" y="42"/>
 						<pt x="1058" y="145.75"/>
@@ -340,33 +348,48 @@
 				</connector>
 				<connector uid="48" angle="1.4742">
 					<from>slowdown_threshold</from>
-					<to>Loss_Increase</to>
-				</connector>
-				<connector uid="49" angle="37.7468">
-					<from>loss_rate</from>
-					<to>Loss_Increase</to>
+					<to>Income_rate</to>
 				</connector>
 				<stacked_container uid="52" x="1058" y="208.719" width="226" height="173">
-					<graph width="226" height="173" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+					<graph width="226" height="173" type="area" isee:sum_stacked_legend="true" isee:stacked_show_hover_values="true" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_title="kč" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
 						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
-							<entity name="company_loss"/>
+							<entity name="Income_rate"/>
 						</plot>
 					</graph>
 				</stacked_container>
 				<connector uid="55" angle="0.566908">
 					<from>Unavailable_capacity</from>
-					<to>Loss_Increase</to>
+					<to>Income_rate</to>
 				</connector>
 				<aux x="1144" y="87" name="allowed maximum"/>
 				<connector uid="56" angle="115.115">
 					<from>allowed_maximum</from>
 					<to>slowdown_threshold</to>
 				</connector>
-				<aux x="916" y="143" name="loss step"/>
-				<connector uid="57" angle="35.2176">
-					<from>loss_step</from>
-					<to>Loss_Increase</to>
+				<connector uid="58" angle="334.381">
+					<from>max_capacity</from>
+					<to>Income_rate</to>
 				</connector>
+				<connector uid="59" angle="8.1301">
+					<from>loss_rate</from>
+					<to>Income_rate</to>
+				</connector>
+				<aux x="1144" y="152" name="max income"/>
+				<connector uid="60" angle="140.194">
+					<from>max_income</from>
+					<to>Income_rate</to>
+				</connector>
+				<stacked_container uid="61" x="1132" y="724">
+					<table width="350" height="250">
+						<item type="time"/>
+						<item>
+							<entity name="Income_rate"/>
+						</item>
+						<item>
+							<entity name="Company_income"/>
+						</item>
+					</table>
+				</stacked_container>
 			</view>
 		</views>
 	</model>
