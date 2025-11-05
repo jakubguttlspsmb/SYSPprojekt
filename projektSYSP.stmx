@@ -8,7 +8,7 @@
 		<product version="4.0" isee:build_number="3710" isee:saved_by_v1="true" lang="en">Stella Professional</product>
 	</header>
 	<ai_information>
-		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1761764025" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="eyPeu3/90mXwfVOqVg5ZrjSQCOw3jk1TyfbiS2JdSljETpm4AScjGKGxejZWP1IQWYvsz5COSkqhlbObhLaODw=="/>
+		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1762331912" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="7gV1QOHcMesg02k5zGDL+26a/lsSiC4lIEQY4AbfOXGu6flYaH60b8kyP2ch2uLy/JxjBYZCs95XRZCKz3B9Cg=="/>
 	</ai_information>
 	<sim_specs isee:sim_duration="1.5" isee:run_prefix="Run" isee:simulation_delay="0.0025" isee:restore_on_start="false" method="Euler" time_units="seconds" isee:instantaneous_flows="false" isee:ignore_module_errors="false" isee:strict_units="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
 		<start>0</start>
@@ -328,8 +328,8 @@ ELSE max_income</eqn>
 					<from>flow_rate</from>
 					<to>Transfer_into_processing</to>
 				</connector>
-				<aux x="445" y="37" name="attack rate increase"/>
-				<connector uid="45" angle="163.142">
+				<aux x="457.25" y="40.875" name="attack rate increase"/>
+				<connector uid="45" angle="157.028">
 					<from>attack_rate_increase</from>
 					<to>attack_rate</to>
 				</connector>
@@ -390,8 +390,20 @@ ELSE max_income</eqn>
 						</item>
 					</table>
 				</stacked_container>
+				<text_box uid="62" x="1372.5" y="96" width="387.5" height="728">Jak se ovlivni chovani modelu pri zmene attack_rate_increase (0 -&gt; 10 -&gt; 50)
+
+Cim vetsi attack_rate_increase, tim rychleji roste attack_rate v prubehu utoku
+
+Na zacatku behu Arrival = 200 + 500 = 700. S rostoucim TIME attack_rate roste.
+
+Unavailable_capacity bude v pripade vysokého attack_rate_increase rust rychleji nez v pripade nizkeho attack_rate_increase, zaroven server zacne ztrácet vice penez a požadavky se zacnou hromadit v Incoming_requests.
+
+Jakmile server prekroci Unavailable capacity, zacnou se požadavky odlevat do unfinished_requests a nestihnou se zpracovat, coz při vyssim attack_rate_increase povede k vyssim hodnotam unfinished_requests</text_box>
 			</view>
 		</views>
 	</model>
+	<isee:controls>
+		<isee:control priority="interactive" name="attack_rate_increase" value="5.00457336755343"/>
+	</isee:controls>
 </xmile>
 
