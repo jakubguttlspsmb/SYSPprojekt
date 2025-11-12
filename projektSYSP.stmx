@@ -8,7 +8,7 @@
 		<product version="4.0" isee:build_number="3710" isee:saved_by_v1="true" lang="en">Stella Professional</product>
 	</header>
 	<ai_information>
-		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1762331912" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="7gV1QOHcMesg02k5zGDL+26a/lsSiC4lIEQY4AbfOXGu6flYaH60b8kyP2ch2uLy/JxjBYZCs95XRZCKz3B9Cg=="/>
+		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1762933872" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="YZO3EVPOclo6z3bKD55IFsaULwz9my0y6yIItWwq1GEwkm0FccfEaui/ACXuBm6H+Djq0uf4DwMYicnHg75FDw=="/>
 	</ai_information>
 	<sim_specs isee:sim_duration="1.5" isee:run_prefix="Run" isee:simulation_delay="0.0025" isee:restore_on_start="false" method="Euler" time_units="seconds" isee:instantaneous_flows="false" isee:ignore_module_errors="false" isee:strict_units="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
 		<start>0</start>
@@ -390,7 +390,7 @@ ELSE max_income</eqn>
 						</item>
 					</table>
 				</stacked_container>
-				<text_box uid="62" x="1372.5" y="96" width="387.5" height="728">Jak se ovlivni chovani modelu pri zmene attack_rate_increase (0 -&gt; 10 -&gt; 50)
+				<text_box uid="62" x="1372.5" y="96" width="387.5" height="230.5">Jak se ovlivni chovani modelu pri zmene attack_rate_increase 
 
 Cim vetsi attack_rate_increase, tim rychleji roste attack_rate v prubehu utoku
 
@@ -399,6 +399,26 @@ Na zacatku behu Arrival = 200 + 500 = 700. S rostoucim TIME attack_rate roste.
 Unavailable_capacity bude v pripade vysokého attack_rate_increase rust rychleji nez v pripade nizkeho attack_rate_increase, zaroven server zacne ztrácet vice penez a požadavky se zacnou hromadit v Incoming_requests.
 
 Jakmile server prekroci Unavailable capacity, zacnou se požadavky odlevat do unfinished_requests a nestihnou se zpracovat, coz při vyssim attack_rate_increase povede k vyssim hodnotam unfinished_requests</text_box>
+				<text_box uid="63" x="167.5" y="928.75" width="673.75" height="110.5">Uspesny DDOS utok
+
+Uspesny DDOS utok nastane tehdy, kdyz se pozadavky zacnou odlevat do unfinished requests, kvuli presahnuti maximalni kapacity pozadavku (max capacity = 50 000)
+.
+Server tyto pozadavky nestiha zpracovat, a tak je po presahnuti limitu vsechny automaticky posila do unfinished requests, kde se nezpracuji</text_box>
+				<text_box uid="64" x="892.5" y="944.375" width="726.25" height="79.25">Neuspesny DDOS utok
+
+Naopak Neuspesny DDOS utok nastava tehdy, kdy server stiha zpracovat vsechny pozadavky, posila je rovnou do finished requests a tudiz v unfinished requests nebude nic.</text_box>
+				<text_box uid="65" x="1365" y="402.75" width="462.5" height="136">Company income a Income rate
+
+Simulovany server vydelava za cas urcitou sumu penez (Income Rate) - predstavme si ho napriklad jako hosting server. Tato suma se scita v Company Income.
+
+Company income a Income rate zavisi na Unavailable capacity (zatizeni serveru). Jakmile hodnota prekroci slowdown_threshold, ktery je pocitan pomoci allowed maximum (procentualni hodnota) a max capacity, tak se kazde procento navic snizuje max income (maximalni vydelek serveru).</text_box>
+				<text_box uid="66" x="1410" y="672.5" width="260" height="103">Vyzkumna otazka: Jak DDOS utok ovlivni vydelek a zatizeni serveru
+
+Odpoved: S rostoucim poctem falesnych pozadavku se zatizeni serveru narazove zvysuje a tim se limituje vydelek serveru</text_box>
+				<text_box uid="67" x="1033.75" y="471.25" width="260" height="58">Skupinka Fedor Filipec Güttl</text_box>
+				<text_box uid="68" x="1386.25" y="845" width="307.5" height="95">Uvod:
+Zkoumame chovani serveru pri DDOS utoku s nastavitelnymi vlastnostmi a jeho prumerny prijem pri tomto utoku.</text_box>
+				<text_box uid="69" x="423" y="1083.75" width="260" height="58">TODO: pohrat si s hodnotami a napsat scenare, klidne presne hodnoty ktere vysly</text_box>
 			</view>
 		</views>
 	</model>
