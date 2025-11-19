@@ -8,7 +8,7 @@
 		<product version="4.0" isee:build_number="3710" isee:saved_by_v1="true" lang="en">Stella Professional</product>
 	</header>
 	<ai_information>
-		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1762933872" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="YZO3EVPOclo6z3bKD55IFsaULwz9my0y6yIItWwq1GEwkm0FccfEaui/ACXuBm6H+Djq0uf4DwMYicnHg75FDw=="/>
+		<status verified="true" trusted="true" tampered="false" uses="false" analyzed="false" log_truncated="false" timestamp="1763541247" algorithm="ed25519" keyurl="https://iseesystems.com/keys/stella01.txt" want_var_info="true" want_var_status="false" want_log="false" sampling="1" signature="9lsol7R3k0hQxfbq/68Qua6UGv/mWHqzp/ldi5opj+4j+ZEPMW2pHJeI7P5D+V+k3CwsRIPeS7mo23vTde9OCg=="/>
 	</ai_information>
 	<sim_specs isee:sim_duration="1.5" isee:run_prefix="Run" isee:simulation_delay="0.0025" isee:restore_on_start="false" method="Euler" time_units="seconds" isee:instantaneous_flows="false" isee:ignore_module_errors="false" isee:strict_units="true" isee:loop_scores="true" isee:loop_exhaustive_allowed="1000">
 		<start>0</start>
@@ -59,7 +59,7 @@
 				<eqn>200</eqn>
 			</aux>
 			<aux name="attack rate">
-				<eqn>500+attack_rate_increase*TIME</eqn>
+				<eqn>base_attack_rate+attack_rate_increase*TIME</eqn>
 			</aux>
 			<aux name="processing rate">
 				<eqn>(300/100)*&quot;server_efficiency_(%)&quot;</eqn>
@@ -111,6 +111,9 @@ ELSE max_income</eqn>
 			</aux>
 			<aux name="max income">
 				<eqn>200</eqn>
+			</aux>
+			<aux name="base attack rate">
+				<eqn>500</eqn>
 			</aux>
 		</variables>
 		<views>
@@ -273,10 +276,19 @@ ELSE max_income</eqn>
 						<pt x="140.5" y="321.188"/>
 					</pts>
 				</flow>
-				<stacked_container uid="24" x="801" y="418" width="202" height="140">
-					<graph width="202" height="140" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+				<stacked_container uid="24" x="1696" y="724.25" width="253.25" height="196.25">
+					<graph width="253.25" height="196.25" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
 						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
 							<entity name="unfinished_requests"/>
+							<isee:data name="Run 83"/>
+						</plot>
+						<plot color="red" pen_style="dot_dashed" isee:keep_zero_visible="true" pen_width="1" index="1" show_y_axis="true">
+							<entity name="unfinished_requests"/>
+							<isee:data name="Run 82"/>
+						</plot>
+						<plot color="fuchsia" pen_style="dotted" isee:keep_zero_visible="true" pen_width="1" index="2" show_y_axis="true">
+							<entity name="unfinished_requests"/>
+							<isee:data name="Run 81"/>
 						</plot>
 					</graph>
 				</stacked_container>
@@ -390,40 +402,89 @@ ELSE max_income</eqn>
 						</item>
 					</table>
 				</stacked_container>
-				<text_box uid="62" x="1372.5" y="96" width="387.5" height="230.5">Jak se ovlivni chovani modelu pri zmene attack_rate_increase 
+				<text_box uid="62" x="1396.25" y="314.75" width="387.5" height="230.5">Jak se ovlivni chovani modelu pri zmene attack_rate_increase
 
 Cim vetsi attack_rate_increase, tim rychleji roste attack_rate v prubehu utoku
 
-Na zacatku behu Arrival = 200 + 500 = 700. S rostoucim TIME attack_rate roste.
+Na zacatku behu Arrival = 200 + base attack rate (500) = 700. S rostoucim TIME attack_rate roste.
 
 Unavailable_capacity bude v pripade vysokého attack_rate_increase rust rychleji nez v pripade nizkeho attack_rate_increase, zaroven server zacne ztrácet vice penez a požadavky se zacnou hromadit v Incoming_requests.
 
 Jakmile server prekroci Unavailable capacity, zacnou se požadavky odlevat do unfinished_requests a nestihnou se zpracovat, coz při vyssim attack_rate_increase povede k vyssim hodnotam unfinished_requests</text_box>
-				<text_box uid="63" x="167.5" y="928.75" width="673.75" height="110.5">Uspesny DDOS utok
+				<text_box uid="63" x="167.5" y="932.5" width="673.75" height="148">Uspesny DDOS utok
 
-Uspesny DDOS utok nastane tehdy, kdyz se pozadavky zacnou odlevat do unfinished requests, kvuli presahnuti maximalni kapacity pozadavku (max capacity = 50 000)
+Uspesny DDOS utok nastane tehdy, kdyz se pozadavky zacnou odlevat do unfinished requests, kvuli presahnuti maximalni kapacity pozadavku (max capacity = 50 000).
 .
-Server tyto pozadavky nestiha zpracovat, a tak je po presahnuti limitu vsechny automaticky posila do unfinished requests, kde se nezpracuji</text_box>
-				<text_box uid="64" x="892.5" y="944.375" width="726.25" height="79.25">Neuspesny DDOS utok
+Server tyto pozadavky nestiha zpracovat, a tak je po presahnuti limitu vsechny automaticky posila do unfinished requests, kde se nezpracuji.
 
-Naopak Neuspesny DDOS utok nastava tehdy, kdy server stiha zpracovat vsechny pozadavky, posila je rovnou do finished requests a tudiz v unfinished requests nebude nic.</text_box>
-				<text_box uid="65" x="1365" y="402.75" width="462.5" height="136">Company income a Income rate
+Konkretne nastane napr. tehdy, kdyz bude base attack rate 1000, attack rate increase 10, server efficiency 90% a attack duration 300 - unfinished requests bude za 600s. 250k</text_box>
+				<text_box uid="64" x="892.5" y="944.375" width="726.25" height="124.25">Neuspesny DDOS utok
+
+Naopak Neuspesny DDOS utok nastava tehdy, kdy server stiha zpracovat vsechny pozadavky, posila je rovnou do finished requests a tudiz v unfinished requests nebude nic.
+
+Konkretne nastane napr. tehdy, kdyz zmenime attack rate increase na 0 a base attack rate na 300 - unfinished requests bude 0 a prijem serveru nebude ovlivnen
+Dale jde take zmenit attack duration napr. na 0 a dosahneme tak stejneho vysledku.</text_box>
+				<text_box uid="65" x="1396.25" y="570.25" width="462.5" height="136">Company income a Income rate
 
 Simulovany server vydelava za cas urcitou sumu penez (Income Rate) - predstavme si ho napriklad jako hosting server. Tato suma se scita v Company Income.
 
 Company income a Income rate zavisi na Unavailable capacity (zatizeni serveru). Jakmile hodnota prekroci slowdown_threshold, ktery je pocitan pomoci allowed maximum (procentualni hodnota) a max capacity, tak se kazde procento navic snizuje max income (maximalni vydelek serveru).</text_box>
-				<text_box uid="66" x="1410" y="672.5" width="260" height="103">Vyzkumna otazka: Jak DDOS utok ovlivni vydelek a zatizeni serveru
+				<text_box uid="66" x="1405" y="177.5" width="452.5" height="137.25">Vyzkumna otazka: Jak DDOS utok ovlivni vydelek a zatizeni serveru?
 
-Odpoved: S rostoucim poctem falesnych pozadavku se zatizeni serveru narazove zvysuje a tim se limituje vydelek serveru</text_box>
-				<text_box uid="67" x="1033.75" y="471.25" width="260" height="58">Skupinka Fedor Filipec Güttl</text_box>
-				<text_box uid="68" x="1386.25" y="845" width="307.5" height="95">Uvod:
+Odpoved: S rostoucim poctem falesnych pozadavku se zatizeni serveru narazove zvysuje a tim se limituje vydelek serveru. Konkretne: finished requests budou 161k a unfinished requests 150k
+
+Zaver: Na server postupne s casem zacne narustat napor prichozich pozadavku, ktere zacnou prevysovat rychlost zpracovani serveru a tim zahlcovat kapacitu, kdy uz server neni dale schopen zpracovavat, odkud jsou prichozi pozadavky poslany do nezpracovanych pozadavku a tim padem server zacne ztracet penize.</text_box>
+				<text_box uid="67" x="1185" y="11.875" width="260" height="58">Skupinka Fedor Filipec Güttl</text_box>
+				<text_box uid="68" x="1407.5" y="75.375" width="307.5" height="95">Uvod:
 Zkoumame chovani serveru pri DDOS utoku s nastavitelnymi vlastnostmi a jeho prumerny prijem pri tomto utoku.</text_box>
-				<text_box uid="69" x="423" y="1083.75" width="260" height="58">TODO: pohrat si s hodnotami a napsat scenare, klidne presne hodnoty ktere vysly</text_box>
+				<text_box uid="70" x="1398.75" y="762.5" width="260" height="193.75">(attack rate increase = 5, base attack rate = 500, attack duration 200)
+
+Pri 100% server efficiency v 600 sekundach  jsou unfinished requests 150k a finished requests 171k
+
+Pri 50% Server Efficiency v 600 sekundach jsou unfinished requests 200k a finished requests 89,6k
+
+Pri 0% Server Efficiency v 600 sekundach jsou unfinished requests 300k a finished requests 0</text_box>
+				<aux x="321.25" y="33.75" name="base attack rate"/>
+				<connector uid="72" angle="341.565">
+					<from>base_attack_rate</from>
+					<to>attack_rate</to>
+				</connector>
+				<stacked_container uid="73" x="793.75" y="409" width="227.5" height="150">
+					<graph width="227.5" height="150" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="unfinished_requests"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="75" x="293.75" y="1095" width="256.25" height="176.25">
+					<graph width="256.25" height="176.25" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="unfinished_requests"/>
+							<isee:data name="Run 86"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<stacked_container uid="74" x="1178.75" y="1095" width="256.25" height="176.25">
+					<graph width="256.25" height="176.25" type="time_series" show_grid="false" isee:tick_type="none" include_units_in_legend="false" plot_numbers="false" isee:label_pie_slices="false" isee:show_pie_borders="true" num_x_grid_lines="0" num_y_grid_lines="0" num_x_labels="5" num_y_labels="3" isee:fill_intensity="0.1" isee:allow_zero_axis="true" left_axis_multi_scale="false" left_axis_auto_scale="true" left_include_units="true" right_axis_multi_scale="false" right_axis_auto_scale="true" right_include_units="true">
+						<plot color="blue" isee:keep_zero_visible="true" pen_width="1" index="0" show_y_axis="true">
+							<entity name="unfinished_requests"/>
+							<isee:data name="Run 85"/>
+						</plot>
+					</graph>
+				</stacked_container>
+				<text_box uid="76" x="767.5" y="1137.5" width="341.25" height="101.75">Citlivostni analyza:
+Pri hybani s vetsinou parametru se grafy pouze rozsiruji a zuzuji, az na:
+finished requests - pri zmene base attack rate kolem cca 150 se z linearni funkce stane linearne lomena a to same pri zmene legitimate rate na cca 5
+Incoming Requests - pri zmene flow rate na cca 1500 se graf zacne lehce deformovat</text_box>
+				<text_box uid="77" x="678.75" y="1353.75" width="628.75" height="129.25">Zdroje:
+
+https://www.researchgate.net/publication/379558791_Enhancing_DDoS_Attack_Detection_and_Mitigation_in_SDN_using_an_Ensemble_Online_Machine_Learning_Model
+
+https://www.mdpi.com/1424-8220/20/11/3078
+
+https://www.sciencedirect.com/science/article/pii/S111086652400080X</text_box>
 			</view>
 		</views>
 	</model>
-	<isee:controls>
-		<isee:control priority="interactive" name="attack_rate_increase" value="5.00457336755343"/>
-	</isee:controls>
 </xmile>
 
